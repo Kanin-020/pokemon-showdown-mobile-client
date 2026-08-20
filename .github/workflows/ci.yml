@@ -10,6 +10,7 @@ jobs:
   build:
     name: Build & Test
     runs-on: ubuntu-latest
+    environment: Pokemon
 
     steps:
       - name: Checkout code
@@ -29,8 +30,6 @@ jobs:
 
       - name: Decode keystore
         run: echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > ${{ github.workspace }}/release-key.jks
-        env:
-          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
 
       - name: Build Debug APK
         run: ./gradlew assembleDebug
