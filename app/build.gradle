@@ -26,8 +26,7 @@ android {
 
     buildTypes {
         debug {
-            // Debug siempre usa el keystore debug del sistema
-            signingConfig signingConfigs.ci
+            // Debug usa el keystore debug del sistema (auto-generado)
         }
         release {
             minifyEnabled false
