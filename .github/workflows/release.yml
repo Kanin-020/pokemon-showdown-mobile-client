@@ -3,21 +3,22 @@ name: Build & Release APK
 on:
   push:
     tags:
-      - 'v*'  # Trigger on version tags like v1.0.0
-  workflow_dispatch:  # Manual trigger
+      - 'v*'
+  workflow_dispatch:
     inputs:
       version:
         description: 'Versión de la release (ej: v1.0.0)'
         required: true
         type: string
       prerelease:
-              description: "Marcar como pre-release"
-              type: boolean
-              default: false
+        description: "Marcar como pre-release"
+        type: boolean
+        default: false
       notes:
-              description: "Notas adicionales para el changelog"
-              required: false
-              default: ""
+        description: "Resumen de los cambios principales"
+        required: true
+        type: string
+
 jobs:
   build:
     name: Build APK
@@ -39,8 +40,19 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
+      - name: Decode keystore
+        run: |
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > $HOME/release-key.jks
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+
       - name: Build Release APK
         run: ./gradlew assembleRelease
+        env:
+          KEYSTORE_PATH: ${{ github.workspace }}/release-key.jks
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
 
       - name: Build Debug APK
         run: ./gradlew assembleDebug
@@ -58,6 +70,10 @@ jobs:
           name: debug-apk
           path: app/build/outputs/apk/debug/*.apk
           retention-days: 30
+
+      - name: Cleanup keystore
+        if: always()
+        run: rm -f $HOME/release-key.jks
 
   release:
     name: Create Release
@@ -97,7 +113,7 @@ jobs:
           body: |
             ## 🎮 Pokémon Showdown Android App
 
-            ${{ startsWith(github.ref, 'refs/tags/') && format('### Cambios\n\n- Ver historial de commits para los cambios', '') || format('### Cambios\n\n{0}', inputs.release_notes) }}
+            ${{ startsWith(github.ref, 'refs/tags/') && format('### Cambios\n\n- Ver historial de commits para los cambios', format('### Cambios\n\n{0}', inputs.notes)) }}
 
             ---
             ### Descargas
@@ -112,7 +128,7 @@ jobs:
             release-apk/*.apk
             debug-apk/*.apk
           draft: false
-          prerelease: false
+          prerelease: ${{ inputs.prerelease || false }}
           generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
