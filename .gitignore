@@ -1,0 +1,31 @@
+# Build outputs
+.gradle/
+app/build/
+build/
+
+# Local configuration (SDK paths, etc.)
+local.properties
+
+# IDE files
+.idea/
+*.iml
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# APK/AAB outputs
+*.apk
+*.aab
+*.ap_
+*.dex
+
+# Generated files
+gen/
+out/
+
+# Proguard
+proguard/
+
+# Log files
+*.log
