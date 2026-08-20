@@ -10,7 +10,9 @@ android {
         applicationId "com.pokemonshowdown.app"
         minSdk 24
         targetSdk 34
-        versionCode 1
+        // versionCode increments automatically based on timestamp
+        // CI can override with: -PVERSION_CODE=123
+        versionCode Integer.parseInt(project.findProperty('VERSION_CODE') ?: System.currentTimeMillis().toString().substring(0, 10))
         versionName "1.0"
     }
 
@@ -45,4 +47,5 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'androidx.webkit:webkit:1.10.0'
     implementation 'com.google.android.material:material:1.11.0'
+    implementation 'androidx.media:media:1.7.0'
 }

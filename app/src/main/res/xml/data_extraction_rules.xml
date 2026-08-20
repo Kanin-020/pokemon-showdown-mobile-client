@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Data extraction rules for Android 12+ (API 31+).
+  Ensures WebView data (cookies, localStorage, cache, databases) survives
+  app updates and device transfers.
+-->
+<data-extraction-rules>
+    <cloud-backup>
+        <!-- Preserve all app data including WebView storage -->
+        <include domain="sharedpref" path="." />
+        <include domain="database" path="." />
+        <include domain="file" path="." />
+        <include domain="external" path="." />
+    </cloud-backup>
+    <device-transfer>
+        <include domain="sharedpref" path="." />
+        <include domain="database" path="." />
+        <include domain="file" path="." />
+        <include domain="external" path="." />
+    </device-transfer>
+</data-extraction-rules>

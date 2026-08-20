@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Backup rules for Android 11 (API 30) and below.
+  Ensures WebView storage (cookies, localStorage, cache) is preserved
+  when the app is updated or the device is backed up.
+-->
+<full-backup-content>
+    <!-- Include all application data -->
+    <include domain="sharedpref" path="." />
+    <include domain="database" path="." />
+    <include domain="file" path="." />
+    <include domain="external" path="." />
+</full-backup-content>
