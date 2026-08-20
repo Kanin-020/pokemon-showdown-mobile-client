@@ -16,8 +16,8 @@ Una aplicación Android nativa que carga Pokémon Showdown directamente en un We
 
 - Android Studio Hedgehog (2023.1.1) o superior
 - SDK Android 34
-- Kotlin 1.9.22+
-- Gradle 8.5+
+- Java 11+
+- Gradle 8.6+
 
 ## Instrucciones de Compilación
 
@@ -82,12 +82,12 @@ También puedes crear releases desde:
 
 ```
 ├── app/
-│   ├── build.gradle.kts          # Configuración de compilación
-│   ├── proguard-rules.pro        # Reglas de ofuscación
+│   ├── build.gradle            # Configuración de compilación
+│   ├── proguard-rules.pro      # Reglas de ofuscación
 │   └── src/main/
-│       ├── AndroidManifest.xml   # Permisos y actividad principal
+│       ├── AndroidManifest.xml # Permisos y actividad principal
 │       ├── java/com/pokemonshowdown/app/
-│       │   └── MainActivity.kt  # WebView que carga el sitio
+│       │   └── MainActivity.java  # WebView que carga el sitio
 │       └── res/
 │           ├── layout/
 │           │   └── activity_main.xml
@@ -95,16 +95,16 @@ También puedes crear releases desde:
 │           │   ├── ic_launcher_background.xml
 │           │   ├── ic_launcher_foreground.xml
 │           │   └── progress_bar_pokemon.xml
-│           ├── mipmap-*/         # Iconos por densidad
+│           ├── mipmap-*/       # Iconos por densidad
 │           └── values/
 │               ├── strings.xml
 │               ├── colors.xml
 │               └── themes.xml
 ├── .github/workflows/
-│   ├── ci.yml                   # CI en push/PR
-│   └── release.yml              # Release automático
-├── build.gradle.kts
-├── settings.gradle.kts
+│   ├── ci.yml                 # CI en push/PR
+│   └── release.yml            # Release automático
+├── build.gradle
+├── settings.gradle
 └── gradle/wrapper/
     └── gradle-wrapper.properties
 ```
@@ -126,9 +126,9 @@ Los iconos se generan automáticamente desde vectores XML.
 ## Personalización
 
 ### Cambiar URL
-Edita `MainActivity.kt` y cambia la constante `URL`:
-```kotlin
-private const val URL = "https://tu-url-aqui.com/"
+Edita `MainActivity.java` y cambia la constante `URL`:
+```java
+private static final String URL = "https://tu-url-aqui.com/";
 ```
 
 ### Modificar colores
@@ -170,5 +170,4 @@ Pokémon Showdown usa WebSockets. Asegúrate de:
 - Genera notas de release automáticamente
 
 ## Licencia
-
 Proyecto de uso personal. Pokémon Showdown es un proyecto open-source de Zarel.
