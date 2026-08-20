@@ -4,7 +4,16 @@ on:
   push:
     tags:
       - 'v*'  # Trigger on version tags like v1.0.0
-  workflow_dispatch:  # Allow manual trigger
+  workflow_dispatch:  # Manual trigger
+    inputs:
+      version:
+        description: 'Versión de la release (ej: v1.0.0)'
+        required: true
+        type: string
+      release_notes:
+        description: 'Resumen de los cambios principales de la release'
+        required: true
+        type: string
 
 jobs:
   build:
@@ -51,7 +60,7 @@ jobs:
     name: Create Release
     needs: build
     runs-on: ubuntu-latest
-    if: startsWith(github.ref, 'refs/tags/')
+    if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch'
     
     permissions:
       contents: write
@@ -73,27 +82,29 @@ jobs:
           path: debug-apk
 
       - name: Get version from tag
-        id: version
-        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+        if: startsWith(github.ref, 'refs/tags/')
+        id: version_tag
+        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
         with:
-          name: "Pokémon Showdown v${{ steps.version.outputs.VERSION }}"
+          tag_name: ${{ startsWith(github.ref, 'refs/tags/') && steps.version_tag.outputs.VERSION || inputs.version }}
+          name: "Pokémon Showdown ${{ startsWith(github.ref, 'refs/tags/') && steps.version_tag.outputs.VERSION || inputs.version }}"
           body: |
-            ## 🎮 Pokémon Showdown Android App v${{ steps.version.outputs.VERSION }}
-            
-            ### What's New
-            - Check the commit history for changes
-            
-            ### Downloads
-            - **Release APK** (`app-release.apk`): Optimized for distribution
-            - **Debug APK** (`app-debug.apk`): For testing
-            
-            ### Installation
-            1. Download the APK file
-            2. Enable "Install from unknown sources" on your device
-            3. Open and install the APK
+            ## 🎮 Pokémon Showdown Android App
+
+            ${{ startsWith(github.ref, 'refs/tags/') && format('### Cambios\n\n- Ver historial de commits para los cambios', '') || format('### Cambios\n\n{0}', inputs.release_notes) }}
+
+            ---
+            ### Descargas
+            - **Release APK** (`app-release.apk`): Optimizado para distribución
+            - **Debug APK** (`app-debug.apk`): Para pruebas
+
+            ### Instalación
+            1. Descarga el archivo APK
+            2. Activa "Fuentes desconocidas" en tu dispositivo
+            3. Abre e instala el APK
           files: |
             release-apk/*.apk
             debug-apk/*.apk

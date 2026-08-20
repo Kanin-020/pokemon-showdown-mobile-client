@@ -74,9 +74,9 @@ El workflow de GitHub Actions creará automáticamente una release con:
 
 ### Releases manuales
 
-También puedes crear releases desde:
-- GitHub > Releases > Draft a new release
-- O ejecutar el workflow manualmente desde la pestaña Actions
+También puedes crear releases ejecutando el workflow manualmente desde la pestaña **Actions > Build & Release APK > Run workflow**. Se te pedirá:
+- **Versión** (ej: `v1.2.0`)
+- **Resumen de los cambios** principales de la release
 
 ## Estructura del Proyecto
 
@@ -165,6 +165,7 @@ Pokémon Showdown usa WebSockets. Asegúrate de:
 
 ### Release (`release.yml`)
 - Se ejecuta al hacer push de un tag `v*`
+- Se puede ejecutar manualmente desde Actions (pide versión y resumen de cambios)
 - Compila APKs
 - Crea release en GitHub con los APKs adjuntos
 - Genera notas de release automáticamente
