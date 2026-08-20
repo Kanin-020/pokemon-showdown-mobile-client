@@ -97,14 +97,14 @@ public class KeepAliveService extends Service {
             PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
         );
 
-        String muteText = isMuted ? "Activar sonido" : "Silenciar";
+        String muteText = isMuted ? getString(R.string.notification_action_enable_sound) : getString(R.string.notification_action_mute);
         int muteIcon = isMuted
             ? android.R.drawable.ic_media_play
             : android.R.drawable.ic_media_pause;
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID)
-            .setContentTitle("Pokémon Showdown")
-            .setContentText(isMuted ? "Audio silenciado" : "Conexión activa")
+            .setContentTitle(getString(R.string.notification_title))
+            .setContentText(isMuted ? getString(R.string.notification_muted) : getString(R.string.notification_active))
             .setSmallIcon(R.drawable.ic_notification)
             .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher))
             .setContentIntent(pendingIntent)
@@ -179,10 +179,10 @@ public class KeepAliveService extends Service {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel channel = new NotificationChannel(
                 CHANNEL_ID,
-                "Pokémon Showdown",
+                getString(R.string.notification_channel_name),
                 NotificationManager.IMPORTANCE_LOW
             );
-            channel.setDescription("Mantiene la conexión activa y control de audio");
+            channel.setDescription(getString(R.string.notification_channel_description));
             channel.setShowBadge(false);
             channel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
 

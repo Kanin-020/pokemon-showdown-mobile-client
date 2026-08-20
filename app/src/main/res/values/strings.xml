@@ -1,4 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Pokémon Showdown</string>
+
+    <!-- Notification -->
+    <string name="notification_title">Pokémon Showdown</string>
+    <string name="notification_active">Connection active</string>
+    <string name="notification_muted">Audio muted</string>
+    <string name="notification_action_enable_sound">Enable sound</string>
+    <string name="notification_action_mute">Mute</string>
+    <string name="notification_channel_name">Pokémon Showdown</string>
+    <string name="notification_channel_description">Keeps connection active and audio control</string>
+
+    <!-- Dialogs -->
+    <string name="dialog_exit_title">Exit</string>
+    <string name="dialog_exit_message">Are you sure you want to exit Pokémon Showdown?</string>
+    <string name="dialog_exit_button">Exit</string>
+    <string name="dialog_cancel_button">Cancel</string>
+
+    <!-- Errors -->
+    <string name="error_open_link">Could not open link</string>
+    <string name="error_connection">Connection error. Check your internet.</string>
 </resources>

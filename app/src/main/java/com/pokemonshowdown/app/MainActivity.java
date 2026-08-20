@@ -114,7 +114,7 @@ public class MainActivity extends AppCompatActivity {
                 try {
                     startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
                 } catch (Exception e) {
-                    Toast.makeText(MainActivity.this, "No se pudo abrir el enlace", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, R.string.error_open_link, Toast.LENGTH_SHORT).show();
                 }
                 return true;
             }
@@ -148,7 +148,7 @@ public class MainActivity extends AppCompatActivity {
                     progressBar.setVisibility(View.GONE);
                     Toast.makeText(
                         MainActivity.this,
-                        "Error de conexion. Verifica tu internet.",
+                        R.string.error_connection,
                         Toast.LENGTH_LONG
                     ).show();
                 }
@@ -255,13 +255,13 @@ public class MainActivity extends AppCompatActivity {
                     webView.goBack();
                 } else {
                     new AlertDialog.Builder(MainActivity.this)
-                        .setTitle("Salir")
-                        .setMessage("Seguro que quieres salir de Pokemon Showdown?")
-                        .setPositiveButton("Salir", (dialog, which) -> {
+                        .setTitle(R.string.dialog_exit_title)
+                        .setMessage(R.string.dialog_exit_message)
+                        .setPositiveButton(R.string.dialog_exit_button, (dialog, which) -> {
                             stopKeepAliveService();
                             finish();
                         })
-                        .setNegativeButton("Cancelar", null)
+                        .setNegativeButton(R.string.dialog_cancel_button, null)
                         .show();
                 }
             }
