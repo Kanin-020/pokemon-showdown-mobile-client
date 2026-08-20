@@ -20,4 +20,11 @@
     <!-- Errors -->
     <string name="error_open_link">Could not open link</string>
     <string name="error_connection">Connection error. Check your internet.</string>
+
+    <!-- Turn notifications -->
+    <string name="turn_notification_title">Your turn!</string>
+    <string name="turn_notification_battle_start">Battle started! Prepare your team!</string>
+    <string name="turn_notification_opponent_joined">%s joined the battle!</string>
+    <string name="turn_notification_channel_name">Turn notifications</string>
+    <string name="turn_notification_channel_description">Notifications when it is your turn</string>
 </resources>

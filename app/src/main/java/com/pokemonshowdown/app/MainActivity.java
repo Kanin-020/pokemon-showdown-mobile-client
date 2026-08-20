@@ -41,6 +41,7 @@ public class MainActivity extends AppCompatActivity {
     private WebView webView;
     private ProgressBar progressBar;
     private AudioManager audioManager;
+    private TurnNotifier turnNotifier;
     private int savedVolume = -1;
     private boolean isMutedByService = false;
 
@@ -53,6 +54,7 @@ public class MainActivity extends AppCompatActivity {
         webView = findViewById(R.id.webView);
         progressBar = findViewById(R.id.progressBar);
         audioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
+        turnNotifier = new TurnNotifier(this);
 
         setupWebView();
         setupBackButton();
@@ -127,6 +129,9 @@ public class MainActivity extends AppCompatActivity {
                 // Inject reconnection script
                 injectReconnectionScript(view);
 
+                // Inject turn detection script
+                injectTurnDetectionScript(view);
+
                 // Inject viewport meta tag
                 view.evaluateJavascript(
                     "(function() {" +
@@ -189,6 +194,9 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        // Register JavaScript interface for turn notifications
+        webView.addJavascriptInterface(turnNotifier, "TurnNotifier");
+
         WebView.setWebContentsDebuggingEnabled(true);
     }
 
@@ -243,6 +251,83 @@ public class MainActivity extends AppCompatActivity {
             "  });" +
             "" +
             "  console.log('[PokemonShowdown] Reconnection handler installed');" +
+            "})();";
+        view.evaluateJavascript(script, null);
+    }
+
+    /**
+     * Injects JavaScript that detects turn changes in Pokemon Showdown battles
+     * and notifies the native side via TurnNotifier interface.
+     */
+    private void injectTurnDetectionScript(WebView view) {
+        String script =
+            "(function() {" +
+            "  if (window._pokemonShowdownTurnDetector) return;" +
+            "  window._pokemonShowdownTurnDetector = true;" +
+            "" +
+            "  var lastTurnValue = '';" +
+            "  var lastBattleState = '';" +
+            "" +
+            "  var observer = new MutationObserver(function(mutations) {" +
+            "    try {" +
+            "      var turnElement = document.querySelector('.battle-controls');" +
+            "      if (!turnElement) turnElement = document.querySelector('[class*=\"turn\"]');" +
+            "      if (!turnElement) turnElement = document.querySelector('.controls');" +
+            "" +
+            "      if (turnElement) {" +
+            "        var currentTurn = turnElement.textContent || '';" +
+            "        if (currentTurn !== lastTurnValue && currentTurn.length > 0) {" +
+            "          lastTurnValue = currentTurn;" +
+            "          if (window.TurnNotifier) {" +
+            "            window.TurnNotifier.onTurnDetected(currentTurn.trim());" +
+            "          }" +
+            "        }" +
+            "      }" +
+            "" +
+            "      var battleRoom = document.querySelector('.pokemon-showdown .battle');" +
+            "      if (battleRoom) {" +
+            "        var battleState = battleRoom.className || '';" +
+            "        if (battleState !== lastBattleState && lastBattleState === '') {" +
+            "          lastBattleState = battleState;" +
+            "          if (window.TurnNotifier) {" +
+            "            window.TurnNotifier.onBattleStart();" +
+            "          }" +
+            "        }" +
+            "      }" +
+            "    } catch(e) {" +
+            "      console.log('[TurnDetector] Error: ' + e.message);" +
+            "    }" +
+            "  });" +
+            "" +
+            "  var target = document.querySelector('.pokemon-showdown') || document.body;" +
+            "  observer.observe(target, {" +
+            "    childList: true," +
+            "    subtree: true," +
+            "    characterData: true," +
+            "    attributes: true" +
+            "  });" +
+            "" +
+            "  var chatObserver = new MutationObserver(function(mutations) {" +
+            "    mutations.forEach(function(mutation) {" +
+            "      mutation.addedNodes.forEach(function(node) {" +
+            "        if (node.nodeType === 1 && node.classList && node.classList.contains('chat')) {" +
+            "          var text = node.textContent || '';" +
+            "          if (text.indexOf('Battle between') === 0 || text.indexOf('VS') >= 0) {" +
+            "            if (window.TurnNotifier) {" +
+            "              window.TurnNotifier.onTurnDetected(text.trim());" +
+            "            }" +
+            "          }" +
+            "        }" +
+            "      });" +
+            "    });" +
+            "  });" +
+            "" +
+            "  var chatArea = document.querySelector('.chatlog') || document.querySelector('.pokemon-showdown');" +
+            "  if (chatArea) {" +
+            "    chatObserver.observe(chatArea, { childList: true, subtree: true });" +
+            "  }" +
+            "" +
+            "  console.log('[TurnDetector] Turn detection installed');" +
             "})();";
         view.evaluateJavascript(script, null);
     }
@@ -357,6 +442,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStop() {
         super.onStop();
+        TurnNotifier.setAppInForeground(false);
         // Pass current mute state to service
         Intent serviceIntent = new Intent(this, KeepAliveService.class);
         serviceIntent.putExtra(KeepAliveService.EXTRA_MUTED, isMutedByService);
@@ -375,6 +461,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
         // Service stays running — no need to restart or stop it.
+        TurnNotifier.setAppInForeground(true);
     }
 
     @Override
