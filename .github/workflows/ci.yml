@@ -28,7 +28,7 @@ jobs:
         run: chmod +x gradlew
 
       - name: Decode keystore
-        run: echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > $HOME/release-key.jks
+        run: echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > ${{ github.workspace }}/release-key.jks
         env:
           KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
 
@@ -54,4 +54,4 @@ jobs:
 
       - name: Cleanup keystore
         if: always()
-        run: rm -f $HOME/release-key.jks
+        run: rm -f ${{ github.workspace }}/release-key.jks
