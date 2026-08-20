@@ -76,7 +76,6 @@ El workflow de GitHub Actions creará automáticamente una release con:
 
 También puedes crear releases ejecutando el workflow manualmente desde la pestaña **Actions > Build & Release APK > Run workflow**. Se te pedirá:
 - **Versión** (ej: `v1.2.0`)
-- **Resumen de los cambios** principales de la release
 
 ## Estructura del Proyecto
 

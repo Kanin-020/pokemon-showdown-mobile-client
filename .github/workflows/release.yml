@@ -10,11 +10,14 @@ on:
         description: 'Versión de la release (ej: v1.0.0)'
         required: true
         type: string
-      release_notes:
-        description: 'Resumen de los cambios principales de la release'
-        required: true
-        type: string
-
+      prerelease:
+              description: "Marcar como pre-release"
+              type: boolean
+              default: false
+      notes:
+              description: "Notas adicionales para el changelog"
+              required: false
+              default: ""
 jobs:
   build:
     name: Build APK
