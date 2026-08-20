@@ -9,17 +9,17 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.os.IBinder;
 import android.os.PowerManager;
 
-import android.support.v4.media.session.MediaSessionCompat;
 import androidx.core.app.NotificationCompat;
-import androidx.media.app.NotificationCompat.MediaStyle;
 
 /**
  * Foreground service that keeps the app alive in the background.
- * Shows a media-style notification (like a music player) with mute/unmute control.
+ * Shows a persistent notification with play/pause mute control.
  */
 public class KeepAliveService extends Service {
 
@@ -30,7 +30,6 @@ public class KeepAliveService extends Service {
 
     private PowerManager.WakeLock wakeLock;
     private BroadcastReceiver muteReceiver;
-    private MediaSessionCompat mediaSession;
     private static boolean isMuted = false;
     private static boolean isRunning = false;
 
@@ -58,7 +57,6 @@ public class KeepAliveService extends Service {
         isRunning = true;
         createNotificationChannel();
         setupMuteReceiver();
-        setupMediaSession();
     }
 
     @Override
@@ -99,15 +97,16 @@ public class KeepAliveService extends Service {
             PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
         );
 
-        String muteText = isMuted ? "Activar audio" : "Silenciar";
+        String muteText = isMuted ? "Activar sonido" : "Silenciar";
         int muteIcon = isMuted
-            ? android.R.drawable.ic_lock_silent_mode_off
-            : android.R.drawable.ic_lock_silent_mode;
+            ? android.R.drawable.ic_media_play
+            : android.R.drawable.ic_media_pause;
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID)
             .setContentTitle("Pokémon Showdown")
             .setContentText(isMuted ? "Audio silenciado" : "Conexión activa")
-            .setSmallIcon(android.R.drawable.ic_media_play)
+            .setSmallIcon(R.drawable.ic_notification)
+            .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher))
             .setContentIntent(pendingIntent)
             .setOngoing(true)
             .setPriority(NotificationCompat.PRIORITY_LOW)
@@ -115,23 +114,7 @@ public class KeepAliveService extends Service {
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             .addAction(muteIcon, muteText, mutePendingIntent);
 
-        // Apply MediaStyle to make it look like a music player notification
-        MediaSessionCompat.Token token = mediaSession != null ? mediaSession.getSessionToken() : null;
-        if (token != null) {
-            builder.setStyle(
-                new MediaStyle()
-                    .setMediaSession(token)
-                    .setShowActionsInCompactView(0)
-                    .setShowCancelButton(false)
-            );
-        }
-
         return builder.build();
-    }
-
-    private void setupMediaSession() {
-        mediaSession = new MediaSessionCompat(this, "PokemonShowdownMedia");
-        mediaSession.setActive(true);
     }
 
     private void setupMuteReceiver() {
@@ -180,10 +163,6 @@ public class KeepAliveService extends Service {
     public void onDestroy() {
         isRunning = false;
         releaseWakeLock();
-        if (mediaSession != null) {
-            mediaSession.setActive(false);
-            mediaSession.release();
-        }
         if (muteReceiver != null) {
             unregisterReceiver(muteReceiver);
         }

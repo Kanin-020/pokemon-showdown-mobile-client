@@ -1,8 +1,12 @@
 package com.pokemonshowdown.app;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import android.media.AudioManager;
 import android.net.Uri;
 import android.net.http.SslError;
@@ -53,6 +57,7 @@ public class MainActivity extends AppCompatActivity {
         setupWebView();
         setupBackButton();
         setupMuteCallback();
+        requestNotificationPermission();
 
         if (savedInstanceState != null) {
             // Restore WebView state from saved instance (process death, config change)
@@ -261,6 +266,16 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    private void requestNotificationPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
+                    != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.POST_NOTIFICATIONS}, 100);
+            }
+        }
     }
 
     private void setupMuteCallback() {
